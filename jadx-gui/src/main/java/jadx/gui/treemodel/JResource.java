@@ -273,10 +273,10 @@ public class JResource extends JLoadableNode {
 		switch (type) {
 			case CODE:
 			case FONT:
-			case LIB:
 			case MEDIA:
 				return false;
-
+				
+			case LIB:
 			case MANIFEST:
 			case XML:
 			case ARSC:

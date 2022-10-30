@@ -51,6 +51,7 @@ import jadx.core.xmlgen.BinaryXMLParser;
 import jadx.core.xmlgen.ProtoXMLParser;
 import jadx.core.xmlgen.ResContainer;
 import jadx.core.xmlgen.ResourcesSaver;
+import jadx.core.libgen.ElfParser;
 
 /**
  * Jadx API usage example:
@@ -92,6 +93,7 @@ public final class JadxDecompiler implements Closeable {
 
 	private BinaryXMLParser binaryXmlParser;
 	private ProtoXMLParser protoXmlParser;
+	private ElfParser elfParser;
 
 	private final Map<ClassNode, JavaClass> classesMap = new ConcurrentHashMap<>();
 	private final Map<MethodNode, JavaMethod> methodsMap = new ConcurrentHashMap<>();
@@ -465,6 +467,13 @@ public final class JadxDecompiler implements Closeable {
 			protoXmlParser = new ProtoXMLParser(root);
 		}
 		return protoXmlParser;
+	}
+
+	synchronized ElfParser getElfParser() {
+		if(elfParser == null) {
+			elfParser = new ElfParser(root);
+		}
+		return elfParser;
 	}
 
 	/**

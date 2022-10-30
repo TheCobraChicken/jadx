@@ -17,9 +17,20 @@ public class ParserStream {
 
 	private final InputStream input;
 	private long readPos = 0;
+	private boolean littleEndian = true;
 
 	public ParserStream(@NotNull InputStream inputStream) {
 		this.input = inputStream;
+	}
+
+	public ParserStream(@NotNull InputStream inputStream, boolean littleEndian) {
+		this.input = inputStream;
+		this.littleEndian = littleEndian;
+	}
+
+	//true == little endian
+	public void setEndian(boolean endian) {
+		this.littleEndian = endian;
 	}
 
 	public long getPos() {
@@ -35,7 +46,11 @@ public class ParserStream {
 		readPos += 2;
 		int b1 = input.read();
 		int b2 = input.read();
-		return (b2 & 0xFF) << 8 | b1 & 0xFF;
+		if(littleEndian) {
+			return (b2 & 0xFF) << 8 | b1 & 0xFF;
+		} else {
+			return (b1 & 0xFF) << 8 | b2 & 0xFF;
+		}
 	}
 
 	public int readInt32() throws IOException {
@@ -45,7 +60,29 @@ public class ParserStream {
 		int b2 = in.read();
 		int b3 = in.read();
 		int b4 = in.read();
-		return b4 << 24 | (b3 & 0xFF) << 16 | (b2 & 0xFF) << 8 | b1 & 0xFF;
+		if(littleEndian) {
+			return b4 << 24 | (b3 & 0xFF) << 16 | (b2 & 0xFF) << 8 | b1 & 0xFF;
+		} else {
+			return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
+		}
+	}
+
+	public long readLong64() throws IOException {
+		readPos += 8;
+		InputStream in = input;
+		int b1 = in.read();
+		int b2 = in.read();
+		int b3 = in.read();
+		int b4 = in.read();
+		int b5 = in.read();
+		int b6 = in.read();
+		int b7 = in.read();
+		int b8 = in.read();
+		if(littleEndian) {
+			return b8 << 56 | b7 << 48 | b6 << 40 |b5 << 32 | b4 << 24 | (b3 & 0xFF) << 16 | (b2 & 0xFF) << 8 | b1 & 0xFF;
+		} else {
+			return b1 << 56 | b2 << 48 | b3 << 40 |b4 << 32 | b5 << 24 | (b6 & 0xFF) << 16 | (b7 & 0xFF) << 8 | b8 & 0xFF;
+		}
 	}
 
 	public long readUInt32() throws IOException {

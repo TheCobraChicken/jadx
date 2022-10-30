@@ -116,6 +116,11 @@ public final class ResourcesLoader {
 			case IMG:
 				return decodeImage(rf, inputStream);
 
+			case LIB:
+				ICodeInfo content;
+				content = jadxRef.getElfParser().parse(inputStream);
+				return ResContainer.textResource(rf.getDeobfName(), content);
+
 			default:
 				return ResContainer.resourceFileLink(rf);
 		}
