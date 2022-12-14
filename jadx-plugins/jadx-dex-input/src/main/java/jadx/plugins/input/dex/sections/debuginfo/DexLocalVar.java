@@ -6,6 +6,9 @@ import jadx.api.plugins.input.data.ILocalVar;
 import jadx.api.plugins.utils.Utils;
 import jadx.plugins.input.dex.sections.SectionReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DexLocalVar implements ILocalVar {
 	private final int regNum;
 	private final String name;
@@ -16,6 +19,7 @@ public class DexLocalVar implements ILocalVar {
 	private boolean isEnd;
 	private int startOffset;
 	private int endOffset;
+	private static final Logger LOG = LoggerFactory.getLogger(DexLocalVar.class);
 
 	public DexLocalVar(SectionReader dex, int regNum, int nameId, int typeId, int signId) {
 		this(regNum, dex.getString(nameId), dex.getType(typeId), dex.getString(signId));
@@ -30,6 +34,7 @@ public class DexLocalVar implements ILocalVar {
 		this.name = name;
 		this.type = type;
 		this.sign = sign;
+		LOG.info("regNum: " + Integer.toString(regNum) + ", name: " + name + ", argType: " + type + ", sign: " + sign);
 	}
 
 	public void start(int addr) {

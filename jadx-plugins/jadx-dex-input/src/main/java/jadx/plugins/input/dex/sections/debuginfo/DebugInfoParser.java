@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jadx.api.plugins.input.data.ILocalVar;
 import jadx.api.plugins.input.data.impl.DebugInfo;
 import jadx.plugins.input.dex.sections.DexConsts;
@@ -45,6 +48,7 @@ public class DebugInfoParser {
 
 	private List<String> argTypes;
 	private int[] argRegs;
+	private static final Logger LOG = LoggerFactory.getLogger(DebugInfoParser.class);
 
 	public DebugInfoParser(SectionReader in, int regsCount, int codeSize) {
 		this.in = in;
@@ -87,20 +91,23 @@ public class DebugInfoParser {
 		resultList = new ArrayList<>();
 		linesMap = new HashMap<>();
 
+		LOG.info("******* Reading debug_info_item *******");
 		int addr = 0;
-		int line = in.readUleb128();
-		int paramsCount = in.readUleb128();
-		int argsCount = argTypes.size();
+		int line = in.readUleb128();	//line_start
+		int paramsCount = in.readUleb128();	//parameters_size
+		int argsCount = argTypes.size();	//parameter_names
 
 		for (int i = 0; i < paramsCount; i++) {
 			int nameId = in.readUleb128p1();
 			String name = ext.getString(nameId);
+			LOG.info("Reading Param: " + name);
 			if (name != null && i < argsCount) {
 				int regNum = argRegs[i];
-				startVar(new DexLocalVar(regNum, name, argTypes.get(i)), -1);
+				startVar(new DexLocalVar(regNum, name, argTypes.get(i)), -1); //startVar(variable, start_offset)
 				varsInfoFound = true;
 			}
 		}
+		LOG.info("******* Reading DBG Vars *******");
 		while (true) {
 			int c = in.readUByte();
 			if (c == DBG_END_SEQUENCE) {
@@ -117,6 +124,9 @@ public class DebugInfoParser {
 					break;
 				}
 				case DBG_START_LOCAL: {
+					LOG.info("Reading DBG_START_LOCAL");
+					LOG.info("startOffset: " + Integer.toString(addr));
+
 					int regNum = in.readUleb128();
 					int nameId = in.readUleb128() - 1;
 					int type = in.readUleb128() - 1;
@@ -126,6 +136,9 @@ public class DebugInfoParser {
 					break;
 				}
 				case DBG_START_LOCAL_EXTENDED: {
+					LOG.info("Reading DBG_START_LOCAL_EXTENDED");
+					LOG.info("startOffset: " + Integer.toString(addr));
+
 					int regNum = in.readUleb128();
 					int nameId = in.readUleb128p1();
 					int type = in.readUleb128p1();

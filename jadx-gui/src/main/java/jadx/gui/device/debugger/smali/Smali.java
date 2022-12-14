@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jadx.api.ICodeInfo;
 import jadx.api.plugins.input.data.AccessFlags;
 import jadx.api.plugins.input.data.AccessFlagsScope;
@@ -77,6 +80,7 @@ public class Smali {
 	private final boolean printBytecode = true;
 
 	private boolean isJavaBytecode;
+	private static final Logger LOG = LoggerFactory.getLogger(Smali.class);
 
 	private Smali() {
 	}
@@ -447,6 +451,8 @@ public class Smali {
 	}
 
 	private boolean formatMthParamInfo(IMethodData mth, SmaliWriter smali, ICodeReader codeReader, LineInfo line) {
+		LOG.info("******* Reading Method *******");
+		LOG.info(mth.toString());
 		List<String> types = mth.getMethodRef().getArgTypes();
 		if (types.isEmpty()) {
 			return false;
